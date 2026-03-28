@@ -11,7 +11,7 @@ db_password = os.getenv("POSTGRES_PASSWORD")
 db_name = os.getenv("POSTGRES_DB")
 
 
-def load_news_seafood_source(start_date: date = None):
+def load_news_seafood_source(start_date: date, end_date: date):
     '''
     use yesterday's date for daily ingestion
     leave start_date empty to write all
@@ -20,13 +20,13 @@ def load_news_seafood_source(start_date: date = None):
     relevant_news = []
 
     for n in news_seafood_source:
-        if not start_date or start_date < n["publication_date"]:    # avoid overwrite using date check
+        if start_date <= n["publication_date"] <= end_date:    # avoid overwrite using date check
             n["id"] = str(uuid.uuid4())
             n["source"] = "seafood_source"
             n["status"] = "new"
             relevant_news.append(n)
     
-    print(f"Found {len(relevant_news)} pieces of news from seafoodsource.com after {start_date}.")
+    print(f"Found {len(relevant_news)} pieces of news from seafoodsource.com between {start_date} and {end_date}.")
 
     try:
         conn = psycopg2.connect(f"dbname={db_name} user={db_username} password={db_password} host={db_host}")
@@ -47,8 +47,8 @@ def load_news_seafood_source(start_date: date = None):
             conn.close()
 
 
-def load_news_seafood_news(start_date: date = None):
-    news_seafood_news = get_news_seafood_news()
+def load_news_seafood_news(start_date: date, end_date: date):
+    news_seafood_news = get_news_seafood_news(start_date, end_date)
     relevant_news = []
 
     for n in news_seafood_news:
@@ -57,7 +57,7 @@ def load_news_seafood_news(start_date: date = None):
         n["status"] = "new"
         relevant_news.append(n)
     
-    print(f"Found {len(relevant_news)} pieces of news from seafoodnews.com after {start_date}.")
+    print(f"Found {len(relevant_news)} pieces of news from seafoodnews.com between {start_date} and {end_date}.")
 
     try:
         conn = psycopg2.connect(f"dbname={db_name} user={db_username} password={db_password} host={db_host}")

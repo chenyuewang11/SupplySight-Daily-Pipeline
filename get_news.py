@@ -56,7 +56,7 @@ def get_news_date_seafood_source(sub_url: str) -> datetime.date:
     print(f"Error getting date at: {seafood_source_url}{sub_url}")
 
 
-def get_news_seafood_news(start_date: date = None):
+def get_news_seafood_news(start_date: date, end_date: date):
     response = requests.get(seafood_news_url)
 
     if response.status_code == 200:
@@ -69,7 +69,7 @@ def get_news_seafood_news(start_date: date = None):
 
             content_type = sub_url.split("/")[1]
             if content_type == "Story":
-                detail = get_news_detail_seafood_news(sub_url, start_date)
+                detail = get_news_detail_seafood_news(sub_url, start_date, end_date)
                 
                 if not detail:
                     return news
@@ -82,7 +82,7 @@ def get_news_seafood_news(start_date: date = None):
     return news
 
 
-def get_news_detail_seafood_news(sub_url: str, start_date: date = None)-> dict:
+def get_news_detail_seafood_news(sub_url: str, start_date: date, end_date: date)-> dict:
     response = requests.get(seafood_news_url + sub_url)
 
     if response.status_code == 200:
@@ -96,7 +96,7 @@ def get_news_detail_seafood_news(sub_url: str, start_date: date = None)-> dict:
             print(f"No publication date found at: https://seafoodnews.com{sub_url}")
             publication_date = None
 
-        if start_date is not None and publication_date < start_date:
+        if not start_date <= publication_date <= end_date:
             return None
 
         title_tag = soup.find('span', class_ = 'StoryTitle')

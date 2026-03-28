@@ -100,11 +100,12 @@ def get_oil_price_df(start_date: date, end_date: date) -> pd.DataFrame:
         data = response.json()
 
         df_oil = pd.DataFrame(data['observations'])
-        df_oil = df_oil[df_oil['value'] != '.'] 
+        if not df_oil.empty:
+            df_oil = df_oil[df_oil['value'] != '.'] 
 
-        df_oil['date'] = pd.to_datetime(df_oil['date'])
-        df_oil['oil_price'] = df_oil['value'].astype(float)
-        df_oil = df_oil[['date', 'oil_price']]
+            df_oil['date'] = pd.to_datetime(df_oil['date'])
+            df_oil['oil_price'] = df_oil['value'].astype(float)
+            df_oil = df_oil[['date', 'oil_price']]
 
         return df_oil
 
@@ -120,6 +121,10 @@ def get_daily_df(start_date: date, end_date: date) -> pd.DataFrame:
 
     df_climate = reduce(lambda left, right: pd.merge(left, right, on = "date", how = "inner"), df_list)
     df_oil = get_oil_price_df(start_date, end_date)
-    df_daily = pd.merge(df_climate, df_oil, on = "date", how = "left")
+    
+    if not df_oil.empty:
+        df_daily = pd.merge(df_climate, df_oil, on = "date", how = "left")
 
-    return(df_daily)
+        return df_daily
+    
+    return df_climate
