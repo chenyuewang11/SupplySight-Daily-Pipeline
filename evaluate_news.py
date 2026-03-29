@@ -97,6 +97,10 @@ def get_evaluated_news(unevaluated_news: list[dict], product_list: list[str]):
     client = Anthropic(api_key = claude_api_key)
     evaulated_news = []
 
+    if not unevaluated_news:
+        print("No news articles to evaluate")
+        return
+
     try:
         relevant_count = 0
         for i, news in enumerate(unevaluated_news):
@@ -125,6 +129,10 @@ def get_evaluated_news(unevaluated_news: list[dict], product_list: list[str]):
     
 
 def load_evaluated_news(evaulated_news: list[dict]):
+    if not evaluate_news:
+        print("No evaluated news articles to load")
+        return
+    
     try:
         conn = psycopg2.connect(f"dbname={db_name} user={db_username} password={db_password} host={db_host}", cursor_factory=RealDictCursor)
 
