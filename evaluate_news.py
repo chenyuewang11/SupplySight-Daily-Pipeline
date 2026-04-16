@@ -106,7 +106,7 @@ def get_evaluated_news(unevaluated_news: list[dict], product_list: list[str]):
         for i, news in enumerate(unevaluated_news):
             results = get_news_evaluation(client, news["id"], news["title"], news["content"], product_list)
 
-            print(f"Evaluated {i+1}/{len(news)} articles")
+            print(f"Evaluated {i+1}/{len(unevaluated_news)} articles")
 
             if results == None:
                 continue
@@ -121,11 +121,12 @@ def get_evaluated_news(unevaluated_news: list[dict], product_list: list[str]):
                 if isinstance(result, dict):
                     evaulated_news.append(result)
 
-        print(f"{relevant_count}/{len(news)} articles were found to be relevant")
+        print(f"{relevant_count}/{len(unevaluated_news)} articles were found to be relevant")
         return evaulated_news
 
     except Exception as e:
         print(f"Error getting evaluated news: {e}")
+        return []
     
 
 def load_evaluated_news(evaulated_news: list[dict]):

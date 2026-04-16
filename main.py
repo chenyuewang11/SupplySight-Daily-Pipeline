@@ -1,8 +1,7 @@
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, date
 from load_daily_data import load_daily_data
-from load_news import load_news_seafood_source, load_news_seafood_news
+from load_news import load_news_seafood_news, load_news_seafood_source
 from evaluate_news import evaluate_news, write_sentiment_score
-
 
 if __name__ == "__main__":
     date_today = datetime.now(timezone.utc).date()

@@ -78,10 +78,14 @@ def get_news_seafood_news(start_date: date, end_date: date):
 
             content_type = sub_url.split("/")[1]
             if content_type == "Story":
-                detail = get_news_detail_seafood_news(sub_url, start_date, end_date)
+                try:
+                    detail = get_news_detail_seafood_news(sub_url, start_date, end_date)
+                
+                except DateException:
+                    continue
                 
                 if not detail:
-                    return news
+                    break
 
                 detail["url"] = f"https://seafoodnews.com{sub_url}"
                 if detail["content"] is not None and "summary" not in detail["title"].lower():
@@ -95,6 +99,9 @@ def get_news_seafood_news(start_date: date, end_date: date):
     print(response.text)
     return []
 
+
+class DateException(Exception):
+    pass
 
 def get_news_detail_seafood_news(sub_url: str, start_date: date, end_date: date)-> dict:
     response = requests.get(seafood_news_url + sub_url, headers=browser_header)
@@ -110,7 +117,10 @@ def get_news_detail_seafood_news(sub_url: str, start_date: date, end_date: date)
             print(f"No publication date found at: https://seafoodnews.com{sub_url}")
             publication_date = None
 
-        if not start_date <= publication_date <= end_date:
+        if publication_date > end_date:
+            raise DateException()
+        
+        if publication_date < start_date:
             return None
 
         title_tag = soup.find('span', class_ = 'StoryTitle')
